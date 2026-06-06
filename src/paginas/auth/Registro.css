@@ -1,0 +1,226 @@
+.registro-hero {
+  width: 100%;
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+}
+
+.registro-pattern {
+  position: absolute;
+  inset: 0;
+  width: 400%;
+  height: 400%;
+  background: url("../../assets/logo.webp");
+  background-size: 110px;
+  opacity: 0.06;
+  filter: brightness(0) invert(1);
+  animation: moverFondoRegistro 25s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes moverFondoRegistro {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(-300px, -300px);
+  }
+}
+
+.registro-contenido {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.registro-logo {
+  width: 230px;
+  animation: flotarRegistro 4s ease-in-out infinite;
+  filter:
+    brightness(0) invert(1)
+    drop-shadow(0 0 18px rgba(255, 255, 255, 0.5))
+    drop-shadow(0 0 44px rgba(255, 255, 255, 0.18));
+}
+
+@keyframes flotarRegistro {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+
+
+.registro-box {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.registro-box input {
+  width: 230px;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  outline: none;
+  text-align: center;
+  background: #1a1a1a;
+  color: white;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+}
+
+.registro-box input::placeholder {
+  color: #777;
+}
+
+.registro-password-box {
+  width: 230px;
+  display: flex;
+  align-items: center;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.registro-password-box input {
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  text-align: center;
+  padding-left: 0;
+  background: transparent;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.registro-password-box button {
+  width: 40px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: white;
+  padding: 10px 0;
+  font-size: 16px;
+}
+
+.registro-pass-strength {
+  width: 230px;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.registro-pass-strength-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.score-1 {
+  background: #ff4545;
+}
+
+.score-2 {
+  background: #ffb300;
+}
+
+.score-3 {
+  background: #00c97a;
+}
+
+.registro-pass-rules {
+  width: 230px;
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: -4px;
+}
+
+.registro-pass-rules.visible {
+  display: flex;
+}
+
+.registro-pass-rule {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: #777;
+  font-family: Arial, sans-serif;
+}
+
+.registro-pass-rule.ok {
+  color: #00c97a;
+}
+
+.registro-pass-rule.fail {
+  color: #ff4545;
+}
+
+.registro-pass-rule .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.registro-btn-main {
+  width: 230px;
+  padding: 10px;
+  background: white;
+  color: black;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition: transform 0.2s;
+  font-family: Arial, sans-serif;
+}
+
+.registro-btn-main:hover {
+  transform: scale(1.03);
+}
+
+.registro-btn-sec {
+  width: 230px;
+  padding: 10px;
+  background: #1a1a1a;
+  border: 1px solid #555;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+  transition: transform 0.2s;
+  font-family: Arial, sans-serif;
+}
+
+.registro-btn-sec:hover {
+  transform: scale(1.02);
+}

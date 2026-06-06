@@ -1,0 +1,149 @@
+.verificacion-hero {
+  width: 100%;
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+}
+
+.verificacion-pattern {
+  position: absolute;
+  inset: 0;
+  width: 400%;
+  height: 400%;
+  background: url("../../assets/logo.webp");
+  background-size: 110px;
+  opacity: 0.06;
+  filter: brightness(0) invert(1);
+  animation: moverFondo2FA 25s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes moverFondo2FA {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(-300px, -300px);
+  }
+}
+
+.verificacion-contenido {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.verificacion-logo {
+  width: 230px;
+  margin-bottom: 15px;
+  animation: flotar2FA 4s ease-in-out infinite;
+  filter:
+    brightness(0) invert(1)
+    drop-shadow(0 0 18px rgba(255, 255, 255, 0.5))
+    drop-shadow(0 0 44px rgba(255, 255, 255, 0.18));
+}
+
+@keyframes flotar2FA {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+.verificacion-contenido h2 {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.verificacion-texto {
+  width: 270px;
+  color: #aaa;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.verificacion-box {
+  width: 270px;
+  padding: 22px 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow:
+    0 0 18px rgba(255, 255, 255, 0.08),
+    0 0 45px rgba(255, 255, 255, 0.05);
+}
+
+.verificacion-box input {
+  width: 220px;
+  padding: 11px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  outline: none;
+  text-align: center;
+  background: #1a1a1a;
+  color: white;
+  font-size: 16px;
+  letter-spacing: 2px;
+  font-family: Arial, sans-serif;
+}
+
+.verificacion-box input::placeholder {
+  color: #777;
+  letter-spacing: 0;
+}
+
+.verificacion-btn-main {
+  width: 220px;
+  padding: 10px;
+  background: white;
+  color: black;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition: transform 0.2s;
+  font-family: Arial, sans-serif;
+}
+
+.verificacion-btn-main:hover {
+  transform: scale(1.03);
+}
+
+.verificacion-btn-sec {
+  width: 220px;
+  padding: 10px;
+  background: #1a1a1a;
+  border: 1px solid #555;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+  transition: transform 0.2s;
+  font-family: Arial, sans-serif;
+}
+
+.verificacion-btn-sec:hover {
+  transform: scale(1.02);
+}
