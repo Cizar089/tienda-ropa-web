@@ -19,6 +19,7 @@ export default function AdminPremios() {
     descripcion: "",
     puntosNecesarios: "",
     tipo: "descuento",
+    descuento: "",
     activo: true
   });
 
@@ -50,6 +51,7 @@ export default function AdminPremios() {
       descripcion: "",
       puntosNecesarios: "",
       tipo: "descuento",
+      descuento: "",
       activo: true
     });
     setEditandoId(null);
@@ -63,11 +65,17 @@ export default function AdminPremios() {
       return;
     }
 
+    if (form.tipo === "descuento" && !form.descuento) {
+      alert("Ingresa el porcentaje de descuento");
+      return;
+    }
+
     const premio = {
       nombre: form.nombre,
       descripcion: form.descripcion,
       puntosNecesarios: Number(form.puntosNecesarios),
       tipo: form.tipo,
+      descuento: form.tipo === "descuento" ? Number(form.descuento || 0) : 0,
       activo: form.activo
     };
 
@@ -90,6 +98,7 @@ export default function AdminPremios() {
       descripcion: premio.descripcion || "",
       puntosNecesarios: premio.puntosNecesarios || "",
       tipo: premio.tipo || "descuento",
+      descuento: premio.descuento || "",
       activo: premio.activo ?? true
     });
   };
@@ -145,6 +154,19 @@ export default function AdminPremios() {
             <option value="pantalon">Pantalón</option>
           </select>
 
+          {form.tipo === "descuento" && (
+            <>
+              <label>DESCUENTO (%)</label>
+              <input
+                type="number"
+                name="descuento"
+                value={form.descuento}
+                onChange={manejarCambio}
+                placeholder="Ej: 10"
+              />
+            </>
+          )}
+
           <label>ESTADO</label>
           <select name="activo" value={form.activo} onChange={manejarCambio}>
             <option value="true">Activo</option>
@@ -175,6 +197,12 @@ export default function AdminPremios() {
 
                 <strong>{premio.puntosNecesarios} puntos</strong>
                 <small>{premio.tipo}</small>
+
+                {premio.tipo === "descuento" && (
+                  <p className="descuento-premio">
+                    Descuento: {premio.descuento || 0}%
+                  </p>
+                )}
 
                 <div className="acciones-premio">
                   <button onClick={() => editarPremio(premio)}>EDITAR</button>

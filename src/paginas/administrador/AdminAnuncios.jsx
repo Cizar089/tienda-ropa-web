@@ -17,9 +17,7 @@ export default function AdminAnuncios() {
   const [form, setForm] = useState({
     titulo: "",
     descripcion: "",
-    imagen: "",
-    activo: true,
-    fecha: new Date().toISOString().slice(0, 10)
+    activo: true
   });
 
   const cargarAnuncios = async () => {
@@ -48,9 +46,7 @@ export default function AdminAnuncios() {
     setForm({
       titulo: "",
       descripcion: "",
-      imagen: "",
-      activo: true,
-      fecha: new Date().toISOString().slice(0, 10)
+      activo: true
     });
     setEditandoId(null);
   };
@@ -66,9 +62,7 @@ export default function AdminAnuncios() {
     const anuncio = {
       titulo: form.titulo,
       descripcion: form.descripcion,
-      imagen: form.imagen,
-      activo: form.activo,
-      fecha: form.fecha
+      activo: form.activo
     };
 
     if (editandoId) {
@@ -88,9 +82,7 @@ export default function AdminAnuncios() {
     setForm({
       titulo: anuncio.titulo || "",
       descripcion: anuncio.descripcion || "",
-      imagen: anuncio.imagen || "",
-      activo: anuncio.activo ?? true,
-      fecha: anuncio.fecha || new Date().toISOString().slice(0, 10)
+      activo: anuncio.activo ?? true
     });
   };
 
@@ -99,13 +91,6 @@ export default function AdminAnuncios() {
 
     await deleteDoc(doc(db, "Anuncios", id));
     cargarAnuncios();
-  };
-
-  const obtenerImagen = (imagen) => {
-    if (!imagen) return "";
-    if (imagen.startsWith("http")) return imagen;
-    if (imagen.startsWith("/")) return imagen;
-    return `/${imagen}`;
   };
 
   return (
@@ -137,35 +122,11 @@ export default function AdminAnuncios() {
             placeholder="Escribe el anuncio..."
           />
 
-          <label>IMAGEN</label>
-          <input
-            name="imagen"
-            value={form.imagen}
-            onChange={manejarCambio}
-            placeholder="imagenes/anuncio1.webp"
-          />
-
-          <label>FECHA</label>
-          <input
-            type="date"
-            name="fecha"
-            value={form.fecha}
-            onChange={manejarCambio}
-          />
-
           <label>ESTADO</label>
           <select name="activo" value={form.activo} onChange={manejarCambio}>
             <option value="true">Activo</option>
             <option value="false">Inactivo</option>
           </select>
-
-          <div className="preview-anuncio">
-            {form.imagen ? (
-              <img src={obtenerImagen(form.imagen)} alt="preview" />
-            ) : (
-              <span>Vista previa</span>
-            )}
-          </div>
 
           <button>{editandoId ? "ACTUALIZAR" : "AGREGAR"}</button>
 
@@ -182,12 +143,6 @@ export default function AdminAnuncios() {
           <div className="anuncios-grid">
             {anuncios.map((anuncio) => (
               <div className="anuncio-card" key={anuncio.id}>
-                {anuncio.imagen ? (
-                  <img src={obtenerImagen(anuncio.imagen)} alt={anuncio.titulo} />
-                ) : (
-                  <div className="sin-imagen">IMG</div>
-                )}
-
                 <div className="anuncio-info">
                   <span className={anuncio.activo ? "estado activo" : "estado inactivo"}>
                     {anuncio.activo ? "ACTIVO" : "INACTIVO"}
@@ -195,11 +150,13 @@ export default function AdminAnuncios() {
 
                   <h3>{anuncio.titulo}</h3>
                   <p>{anuncio.descripcion}</p>
-                  <small>{anuncio.fecha}</small>
 
                   <div className="acciones-anuncio">
                     <button onClick={() => editarAnuncio(anuncio)}>EDITAR</button>
-                    <button className="eliminar" onClick={() => eliminarAnuncio(anuncio.id)}>
+                    <button
+                      className="eliminar"
+                      onClick={() => eliminarAnuncio(anuncio.id)}
+                    >
                       ELIMINAR
                     </button>
                   </div>

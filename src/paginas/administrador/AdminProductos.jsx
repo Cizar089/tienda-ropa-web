@@ -53,7 +53,7 @@ export default function AdminProductos() {
 
     setForm({
       ...form,
-      [name]: name === "oferta" ? value === "true" : value
+      [name]: value
     });
   };
 
@@ -70,6 +70,24 @@ export default function AdminProductos() {
       descripcion: ""
     });
     setEditandoId(null);
+  };
+
+  const obtenerSrcImagen = (imagen) => {
+    if (!imagen || imagen.trim() === "") {
+      return "/icons.svg";
+    }
+
+    const ruta = imagen.trim();
+
+    if (ruta.startsWith("http://") || ruta.startsWith("https://")) {
+      return ruta;
+    }
+
+    if (ruta.startsWith("/")) {
+      return ruta;
+    }
+
+    return `/${ruta}`;
   };
 
   const guardarProducto = async (e) => {
@@ -139,20 +157,6 @@ export default function AdminProductos() {
     }
   };
 
-  const obtenerSrcImagen = (imagen) => {
-    if (!imagen) return "";
-
-    if (imagen.startsWith("http")) {
-      return imagen;
-    }
-
-    if (imagen.startsWith("/")) {
-      return imagen;
-    }
-
-    return `/${imagen}`;
-  };
-
   const productosFiltrados = productos.filter((p) =>
     p.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
     p.tipo?.toLowerCase().includes(busqueda.toLowerCase())
@@ -160,7 +164,7 @@ export default function AdminProductos() {
 
   const totalOfertas = productos.filter((p) => p.estado === "oferta").length;
   const totalDescuento = productos.filter((p) => Number(p.descuento) > 0).length;
-  const totalAgotados = productos.filter((p) => p.estado === "agotado").length;
+
   return (
     <div className="admin">
       <header className="topbar">
@@ -275,29 +279,31 @@ export default function AdminProductos() {
 
             <div>
               <label>ESTADO</label>
-                <select name="estado" value={form.estado} onChange={manejarCambio}>
-                    <option value="disponible">Disponible</option>
-                    <option value="agotado">Agotado</option>
-                    <option value="oferta">En oferta</option>
-                </select>
+              <select name="estado" value={form.estado} onChange={manejarCambio}>
+                <option value="disponible">Disponible</option>
+                <option value="agotado">Agotado</option>
+                <option value="oferta">En oferta</option>
+              </select>
             </div>
 
             <div className="full">
-              <label>IMAGEN (URL o ruta)</label>
+              <label>IMAGEN</label>
               <input
                 name="imagen"
                 value={form.imagen}
                 onChange={manejarCambio}
-                placeholder="imagenes/producto.webp"
+                placeholder="Ej: /imagenes/polera.webp o https://..."
               />
             </div>
 
             <div className="preview">
-              {form.imagen ? (
-                <img src={obtenerSrcImagen(form.imagen)} alt="Vista previa" />
-              ) : (
-                <span>Vista previa</span>
-              )}
+              <img
+                src={obtenerSrcImagen(form.imagen)}
+                alt="Vista previa"
+                onError={(e) => {
+                  e.currentTarget.src = "/icons.svg";
+                }}
+              />
             </div>
 
             <div className="full">
@@ -350,15 +356,14 @@ export default function AdminProductos() {
                 {productosFiltrados.map((p) => (
                   <tr key={p.id}>
                     <td>
-                      {p.imagen ? (
-                        <img
-                          className="img-producto"
-                          src={obtenerSrcImagen(p.imagen)}
-                          alt={p.nombre}
-                        />
-                      ) : (
-                        <div className="sin-img">IMG</div>
-                      )}
+                      <img
+                        className="img-producto"
+                        src={obtenerSrcImagen(p.imagen)}
+                        alt={p.nombre}
+                        onError={(e) => {
+                          e.currentTarget.src = "/icons.svg";
+                        }}
+                      />
                     </td>
 
                     <td className="nombre">{p.nombre}</td>
@@ -385,13 +390,13 @@ export default function AdminProductos() {
                     </td>
 
                     <td>
-                        <span className={`estado ${p.estado}`}>
+                      <span className={`estado ${p.estado}`}>
                         {p.estado === "oferta"
-                            ? "OFERTA"
-                            : p.estado === "agotado"
-                            ? "AGOTADO"
-                            : "DISPONIBLE"}
-                        </span>
+                          ? "OFERTA"
+                          : p.estado === "agotado"
+                          ? "AGOTADO"
+                          : "DISPONIBLE"}
+                      </span>
                     </td>
 
                     <td>

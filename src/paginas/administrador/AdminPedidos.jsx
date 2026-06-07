@@ -1,206 +1,240 @@
 import { useEffect, useState } from "react";
 import {
   collection,
-  addDoc,
   getDocs,
   updateDoc,
   deleteDoc,
-  doc
+  doc,
+  getDoc,
+  increment,
+  addDoc
 } from "firebase/firestore";
 import { db } from "../../servicios/firebase";
-import "./AdminPremios.css";
+import "./AdminPedidos.css";
 
-export default function AdminPremios() {
-  const [premios, setPremios] = useState([]);
-  const [editandoId, setEditandoId] = useState(null);
+export default function AdminPedidos() {
+  const [pedidos, setPedidos] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
 
-  const [form, setForm] = useState({
-    nombre: "",
-    descripcion: "",
-    puntosNecesarios: "",
-    tipo: "descuento",
-    activo: true
-  });
-
-  const cargarPremios = async () => {
-    const datos = await getDocs(collection(db, "Premios"));
-    const lista = datos.docs.map((d) => ({
-      id: d.id,
-      ...d.data()
-    }));
-    setPremios(lista);
+  const obtenerPedidos = async () => {
+    try {
+      const datos = await getDocs(collection(db, "Pedidos"));
+      const lista = datos.docs.map((item) => ({
+        id: item.id,
+        ...item.data()
+      }));
+      setPedidos(lista);
+    } catch (error) {
+      console.error("Error al obtener pedidos:", error);
+    }
   };
 
   useEffect(() => {
-    cargarPremios();
+    obtenerPedidos();
   }, []);
 
-  const manejarCambio = (e) => {
-    const { name, value } = e.target;
+  const sumarPuntosCliente = async (pedido) => {
+    const correo = pedido.correoCliente;
+    const total = Number(pedido.total || 0);
+    const puntosGanados = Math.floor(total / 5);
 
-    setForm({
-      ...form,
-      [name]: name === "activo" ? value === "true" : value
+    if (!correo) {
+      alert("El pedido no tiene correo del cliente.");
+      return false;
+    }
+
+    const clienteRef = doc(db, "Clientes", correo);
+    const clienteSnap = await getDoc(clienteRef);
+
+    if (!clienteSnap.exists()) {
+      alert("No existe un cliente registrado con ese correo.");
+      return false;
+    }
+
+    await updateDoc(clienteRef, {
+      puntosAcumulados: increment(puntosGanados),
+      puntosDisponibles: increment(puntosGanados)
     });
+
+    await updateDoc(doc(db, "Pedidos", pedido.id), {
+      puntosAsignadosPedido: true,
+      puntosGenerados: puntosGanados
+    });
+
+    return true;
   };
 
-  const limpiar = () => {
-    setForm({
-      nombre: "",
-      descripcion: "",
-      puntosNecesarios: "",
-      tipo: "descuento",
-      activo: true
-    });
-    setEditandoId(null);
-  };
-
-  const guardarPremio = async (e) => {
-    e.preventDefault();
-
-    if (!form.nombre || !form.puntosNecesarios || !form.tipo) {
-      alert("Completa los campos principales");
+  const registrarVenta = async (pedido) => {
+    if (pedido.ventaRegistrada === true) {
       return;
     }
 
-    const premio = {
-      nombre: form.nombre,
-      descripcion: form.descripcion,
-      puntosNecesarios: Number(form.puntosNecesarios),
-      tipo: form.tipo,
-      activo: form.activo
-    };
+    await addDoc(collection(db, "Ventas"), {
+      pedidoId: pedido.id,
+      nombreCliente: pedido.nombreCliente || "",
+      correoCliente: pedido.correoCliente || "",
+      telefonoCliente: pedido.telefonoCliente || "",
+      departamento: pedido.departamento || "",
+      productos: pedido.productos || [],
+      total: Number(pedido.total || 0),
+      estado: "Completada",
+      fecha: new Date().toLocaleString(),
+      puntosGenerados: Number(pedido.puntosGenerados || 0)
+    });
 
-    if (editandoId) {
-      await updateDoc(doc(db, "Premios", editandoId), premio);
-      alert("Premio actualizado");
-    } else {
-      await addDoc(collection(db, "Premios"), premio);
-      alert("Premio agregado");
-    }
-
-    limpiar();
-    cargarPremios();
-  };
-
-  const editarPremio = (premio) => {
-    setEditandoId(premio.id);
-    setForm({
-      nombre: premio.nombre || "",
-      descripcion: premio.descripcion || "",
-      puntosNecesarios: premio.puntosNecesarios || "",
-      tipo: premio.tipo || "descuento",
-      activo: premio.activo ?? true
+    await updateDoc(doc(db, "Pedidos", pedido.id), {
+      ventaRegistrada: true
     });
   };
 
-  const eliminarPremio = async (id) => {
-    if (!confirm("¿Eliminar premio?")) return;
+  const cambiarEstado = async (pedido, nuevoEstado) => {
+    try {
+      const yaEstabaConfirmado = pedido.estado === "Confirmado";
+      const vaAConfirmado = nuevoEstado === "Confirmado";
+      const yaTienePuntos = pedido.puntosAsignadosPedido === true;
 
-    await deleteDoc(doc(db, "Premios", id));
-    cargarPremios();
+      if (vaAConfirmado && !yaEstabaConfirmado && !yaTienePuntos) {
+        const puntosOk = await sumarPuntosCliente(pedido);
+
+        if (!puntosOk) {
+          return;
+        }
+      }
+
+      if (nuevoEstado === "Pedido en destino") {
+        await registrarVenta(pedido);
+      }
+
+      await updateDoc(doc(db, "Pedidos", pedido.id), {
+        estado: nuevoEstado
+      });
+
+      obtenerPedidos();
+      alert("Estado actualizado correctamente");
+    } catch (error) {
+      console.error("Error al cambiar estado:", error);
+      alert("No se pudo cambiar el estado");
+    }
   };
 
+  const eliminarPedido = async (id) => {
+    if (!confirm("¿Seguro que deseas eliminar este pedido?")) return;
+
+    try {
+      await deleteDoc(doc(db, "Pedidos", id));
+      obtenerPedidos();
+      alert("Pedido eliminado");
+    } catch (error) {
+      console.error("Error al eliminar:", error);
+      alert("No se pudo eliminar");
+    }
+  };
+
+  const pedidosFiltrados = pedidos.filter((pedido) =>
+    pedido.nombreCliente?.toLowerCase().includes(busqueda.toLowerCase()) ||
+    pedido.correoCliente?.toLowerCase().includes(busqueda.toLowerCase()) ||
+    pedido.estado?.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
   return (
-    <div className="admin-premios">
-      <header className="premios-header">
+    <div className="admin-pedidos">
+      <header className="pedidos-header">
         <div>
-          <p>INSIGNIS STORE / RECOMPENSAS</p>
-          <h1>GESTIÓN DE PREMIOS</h1>
+          <h1>GESTIÓN DE PEDIDOS</h1>
+          <p>{pedidos.length} pedidos registrados</p>
         </div>
+
+        <input
+          type="text"
+          placeholder="Buscar pedido..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
       </header>
 
-      <section className="premios-layout">
-        <form className="premios-form" onSubmit={guardarPremio}>
-          <h2>{editandoId ? "Editar premio" : "Nuevo premio"}</h2>
+      <div className="tabla-pedidos">
+        <table>
+          <thead>
+            <tr>
+              <th>CLIENTE</th>
+              <th>CORREO</th>
+              <th>TELÉFONO</th>
+              <th>DEPTO.</th>
+              <th>PRODUCTOS</th>
+              <th>TOTAL</th>
+              <th>PUNTOS</th>
+              <th>ESTADO</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
 
-          <label>NOMBRE</label>
-          <input
-            name="nombre"
-            value={form.nombre}
-            onChange={manejarCambio}
-            placeholder="Ej: Descuento 10%"
-          />
+          <tbody>
+            {pedidosFiltrados.map((pedido) => (
+              <tr key={pedido.id}>
+                <td>{pedido.nombreCliente || "Sin nombre"}</td>
+                <td>{pedido.correoCliente || "Sin correo"}</td>
+                <td>{pedido.telefonoCliente || "Sin teléfono"}</td>
+                <td>{pedido.departamento || "Sin dato"}</td>
 
-          <label>DESCRIPCIÓN</label>
-          <textarea
-            name="descripcion"
-            value={form.descripcion}
-            onChange={manejarCambio}
-            placeholder="Descripción del premio..."
-          />
+                <td>
+                  {pedido.productos?.map((producto, index) => (
+                    <div className="producto-pedido" key={index}>
+                      <strong>{producto.nombre}</strong>
+                      <span>Cantidad: {producto.cantidad}</span>
+                      <span>Color: {producto.color}</span>
+                      <span>Precio: Bs.{producto.precio}</span>
+                    </div>
+                  ))}
+                </td>
 
-          <label>PUNTOS NECESARIOS</label>
-          <input
-            type="number"
-            name="puntosNecesarios"
-            value={form.puntosNecesarios}
-            onChange={manejarCambio}
-            placeholder="100"
-          />
+                <td>
+                  <strong>Bs.{pedido.total}</strong>
+                </td>
 
-          <label>TIPO</label>
-          <select name="tipo" value={form.tipo} onChange={manejarCambio}>
-            <option value="descuento">Descuento</option>
-            <option value="gorra">Gorra</option>
-            <option value="polera">Polera</option>
-            <option value="pantalon">Pantalón</option>
-          </select>
+                <td>
+                  {pedido.puntosAsignadosPedido ? (
+                    <span className="puntos-ok">
+                      +{pedido.puntosGenerados} pts
+                    </span>
+                  ) : (
+                    <span className="puntos-pendiente">Pendiente</span>
+                  )}
+                </td>
 
-          <label>ESTADO</label>
-          <select name="activo" value={form.activo} onChange={manejarCambio}>
-            <option value="true">Activo</option>
-            <option value="false">Inactivo</option>
-          </select>
+                <td>
+                  <select
+                    className="estado-select"
+                    value={pedido.estado || "Solicitado"}
+                    onChange={(e) => cambiarEstado(pedido, e.target.value)}
+                  >
+                    <option value="Solicitado">Solicitado</option>
+                    <option value="Confirmado">Confirmado</option>
+                    <option value="Pedido en camino">Pedido en camino</option>
+                    <option value="Pedido en destino">Pedido en destino</option>
+                  </select>
+                </td>
 
-          <button>{editandoId ? "ACTUALIZAR" : "AGREGAR"}</button>
-
-          {editandoId && (
-            <button type="button" className="cancelar" onClick={limpiar}>
-              CANCELAR
-            </button>
-          )}
-        </form>
-
-        <div className="premios-lista">
-          <h2>Premios disponibles</h2>
-
-          <div className="premios-grid">
-            {premios.map((premio) => (
-              <div className="premio-card" key={premio.id}>
-                <div className="premio-info">
-                  <span className={premio.activo ? "estado activo" : "estado inactivo"}>
-                    {premio.activo ? "ACTIVO" : "INACTIVO"}
-                  </span>
-
-                  <h3>{premio.nombre}</h3>
-                  <p>{premio.descripcion}</p>
-
-                  <strong className="puntos">
-                    {premio.puntosNecesarios} puntos
-                  </strong>
-
-                  <small>{premio.tipo}</small>
-
-                  <div className="acciones-premio">
-                    <button onClick={() => editarPremio(premio)}>EDITAR</button>
-                    <button
-                      className="eliminar"
-                      onClick={() => eliminarPremio(premio.id)}
-                    >
-                      ELIMINAR
-                    </button>
-                  </div>
-                </div>
-              </div>
+                <td>
+                  <button
+                    className="btn-eliminar-pedido"
+                    onClick={() => eliminarPedido(pedido.id)}
+                  >
+                    ELIMINAR
+                  </button>
+                </td>
+              </tr>
             ))}
 
-            {premios.length === 0 && (
-              <p className="vacio">No hay premios registrados.</p>
+            {pedidosFiltrados.length === 0 && (
+              <tr>
+                <td colSpan="9" className="sin-pedidos">
+                  No hay pedidos registrados
+                </td>
+              </tr>
             )}
-          </div>
-        </div>
-      </section>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
