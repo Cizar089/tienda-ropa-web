@@ -24,6 +24,8 @@ import facebook from "../../assets/facebook.webp";
 function Login() {
   const navigate = useNavigate();
 
+  const CORREO_ADMIN = "tcjhon078@gmail.com";
+
   const [mostrarLogin, setMostrarLogin] = useState(false);
   const [usuario, setUsuario] = useState(null);
 
@@ -46,6 +48,10 @@ function Login() {
     setTimeout(() => {
       setToast({ mensaje: "", tipo: "success" });
     }, 3000);
+  };
+
+  const esAdmin = (correo) => {
+    return String(correo || "").toLowerCase() === CORREO_ADMIN;
   };
 
   const loginEmail = async () => {
@@ -82,12 +88,14 @@ function Login() {
     try {
       const resultado = await signInWithPopup(auth, googleProvider);
 
-      setUsuario({
+      const usuarioGoogle = {
         nombre: resultado.user.displayName || resultado.user.email,
         correo: resultado.user.email,
         foto: resultado.user.photoURL || logo,
         tipo: "google",
-      });
+      };
+
+      setUsuario(usuarioGoogle);
 
       mostrarToast("Inicio con Google correcto", "success");
     } catch (error) {
@@ -114,17 +122,27 @@ function Login() {
 
     if (usuario.tipo === "google") {
       try {
-        await crearClienteSiNoExiste({
-          nombre: usuario.nombre,
-          correo: usuario.correo,
-          foto: usuario.foto,
-        });
-
         localStorage.removeItem("guest");
         localStorage.removeItem("usuarioTemporal");
         sessionStorage.removeItem("flujo2FA");
 
         localStorage.setItem("usuarioCliente", JSON.stringify(usuario));
+
+        if (esAdmin(usuario.correo)) {
+          mostrarToast("Bienvenido administrador", "success");
+
+          setTimeout(() => {
+            navigate("/admin/acceso");
+          }, 1000);
+
+          return;
+        }
+
+        await crearClienteSiNoExiste({
+          nombre: usuario.nombre,
+          correo: usuario.correo,
+          foto: usuario.foto,
+        });
 
         mostrarToast("Bienvenido a Insignis", "success");
 
@@ -142,19 +160,16 @@ function Login() {
     try {
       mostrarToast("Enviando código al correo...", "success");
 
-      const respuesta = await fetch(
-  `${API_URL}/enviarCodigo2FA.php`,
-  {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: usuario.correo,
-            nombre: usuario.nombre,
-          }),
-        }
-      );
+      const respuesta = await fetch(`${API_URL}/enviarCodigo2FA.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: usuario.correo,
+          nombre: usuario.nombre,
+        }),
+      });
 
       const data = await respuesta.json();
 
@@ -221,6 +236,10 @@ function Login() {
 
             <h3>{usuario.nombre}</h3>
             <p>{usuario.correo}</p>
+
+            {esAdmin(usuario.correo) && usuario.tipo === "google" && (
+              <p className="admin-login-text">Acceso administrativo</p>
+            )}
 
             <button className="btn-main" onClick={entrarSistema}>
               ENTRAR
