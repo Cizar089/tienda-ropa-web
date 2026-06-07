@@ -1,0 +1,179 @@
+.admin-premios {
+  min-height: 100vh;
+  background: #02040a;
+  color: white;
+  padding: 35px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.premios-header,
+.premios-form,
+.premios-lista {
+  background: rgba(5, 12, 25, 0.95);
+  border: 1px solid rgba(100, 180, 255, 0.25);
+  border-radius: 18px;
+  padding: 25px;
+}
+
+.premios-header {
+  margin-bottom: 25px;
+}
+
+.premios-header p {
+  color: #6db7ff;
+  letter-spacing: 4px;
+  font-size: 12px;
+  margin: 0;
+}
+
+.premios-header h1 {
+  margin: 8px 0 0;
+  letter-spacing: 4px;
+}
+
+.premios-layout {
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  gap: 25px;
+}
+
+.premios-form h2,
+.premios-lista h2 {
+  margin-top: 0;
+  color: #8dbdf5;
+}
+
+.premios-form label {
+  display: block;
+  color: #9ca3af;
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin: 14px 0 7px;
+  font-weight: bold;
+}
+
+.premios-form input,
+.premios-form textarea,
+.premios-form select {
+  width: 100%;
+  background: #07111f;
+  border: 1px solid rgba(100, 180, 255, 0.25);
+  color: white;
+  padding: 13px;
+  border-radius: 9px;
+  outline: none;
+}
+
+.premios-form textarea {
+  height: 100px;
+  resize: none;
+}
+
+.premios-form button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  border: none;
+  border-radius: 9px;
+  background: #4da3ff;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.premios-form .cancelar {
+  background: #444;
+  color: white;
+}
+
+.premios-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.premio-card {
+  background: rgba(10, 20, 40, 0.85);
+  border: 1px solid rgba(100, 180, 255, 0.25);
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.premio-card h3 {
+  margin: 15px 0 8px;
+  color: white;
+}
+
+.premio-card p {
+  color: #b9c7d8;
+}
+
+.premio-card strong {
+  display: block;
+  color: #00ff9d;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.premio-card small {
+  color: #8dbdf5;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.estado {
+  padding: 6px 9px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.activo {
+  background: rgba(0, 255, 157, 0.15);
+  color: #00ff9d;
+}
+
+.inactivo {
+  background: rgba(255, 77, 77, 0.15);
+  color: #ff4d4d;
+}
+
+.acciones-premio {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.acciones-premio button {
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  background: #1f2937;
+  color: white;
+}
+
+.acciones-premio .eliminar {
+  background: #4a0000;
+  color: #ff5555;
+}
+
+.vacio {
+  color: #aaa;
+}
+
+@media (max-width: 1000px) {
+  .premios-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .premios-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.descuento-premio {
+  color: #facc15;
+  font-weight: bold;
+  margin-top: 8px;
+}
