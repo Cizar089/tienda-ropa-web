@@ -1,10 +1,10 @@
 <?php
 return [
     "host" => "smtp.gmail.com",
-    "username" => "TU_CORREO@gmail.com",
-    "password" => "TU_PASSWORD_DE_APLICACION",
+    "username" => "tcjhon078@gmail.com",
+    "password" => "pxnwqqgjtkuwbbof",
     "port" => 587,
-    "from_email" => "TU_CORREO@gmail.com",
+    "from_email" => "tcjhon078@gmail.com",
     "from_name" => "Insignis Store"
 ];
 ?>

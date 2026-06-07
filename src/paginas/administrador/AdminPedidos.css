@@ -1,0 +1,114 @@
+.admin-pedidos {
+  min-height: 100vh;
+  background: #050505;
+  color: white;
+  padding: 35px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.pedidos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.pedidos-header h1 {
+  margin: 0;
+  letter-spacing: 4px;
+}
+
+.pedidos-header p {
+  color: #999;
+}
+
+.pedidos-header input {
+  width: 300px;
+  background: #171717;
+  border: 1px solid #292929;
+  color: white;
+  padding: 14px;
+  border-radius: 6px;
+  outline: none;
+}
+
+.tabla-pedidos {
+  background: #111;
+  border: 1px solid #242424;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1200px;
+}
+
+thead {
+  background: #181818;
+}
+
+th {
+  color: #999;
+  text-align: left;
+  padding: 18px;
+  font-size: 11px;
+  letter-spacing: 3px;
+}
+
+td {
+  padding: 18px;
+  border-top: 1px solid #242424;
+  vertical-align: top;
+}
+
+.producto-pedido {
+  background: #181818;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.producto-pedido span {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.estado-select {
+  background: #171717;
+  color: #00d478;
+  border: 1px solid #333;
+  padding: 10px;
+  border-radius: 5px;
+  outline: none;
+}
+
+.btn-eliminar-pedido {
+  background: transparent;
+  border: 1px solid #4b1111;
+  color: #ef4444;
+  padding: 10px 14px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.sin-pedidos {
+  text-align: center;
+  color: #777;
+  padding: 35px;
+}
+
+.puntos-ok {
+  color: #00d478;
+  font-weight: bold;
+}
+
+.puntos-pendiente {
+  color: #f59e0b;
+  font-weight: bold;
+}

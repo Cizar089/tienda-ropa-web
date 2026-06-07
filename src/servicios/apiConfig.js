@@ -1,0 +1,1 @@
+export const API_URL = "http://localhost:8080/insignis-store/backend/api";
