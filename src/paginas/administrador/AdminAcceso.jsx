@@ -10,7 +10,7 @@ export default function AdminAcceso() {
   const validar = (e) => {
     e.preventDefault();
 
-    if (codigo === "0000") {
+    if (codigo === "0717") {
       localStorage.setItem("adminAccess", "true");
       navigate("/admin/panel");
     } else {
