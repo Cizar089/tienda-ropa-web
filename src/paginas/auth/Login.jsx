@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_URL } from "../../servicios/apiConfig";
 import { useNavigate } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
@@ -6,6 +7,11 @@ import {
 } from "firebase/auth";
 
 import { auth, googleProvider } from "../../servicios/firebase";
+import {
+  crearClienteSiNoExiste,
+  obtenerClientePorCorreo,
+} from "../../servicios/clientesService";
+
 import Toast from "../../componentes/ui/Toast";
 import "./Login.css";
 
@@ -51,8 +57,15 @@ function Login() {
     try {
       const resultado = await signInWithEmailAndPassword(auth, email, pass);
 
+      const correoNormalizado = resultado.user.email.toLowerCase();
+
+      const cliente = await obtenerClientePorCorreo(correoNormalizado);
+
       setUsuario({
-        nombre: resultado.user.displayName || resultado.user.email,
+        nombre:
+          cliente?.nombre ||
+          resultado.user.displayName ||
+          resultado.user.email,
         correo: resultado.user.email,
         foto: logo,
         tipo: "correo",
@@ -60,6 +73,7 @@ function Login() {
 
       mostrarToast("Inicio de sesión correcto", "success");
     } catch (error) {
+      console.error("Error correo:", error);
       mostrarToast("Correo o contraseña incorrectos", "error");
     }
   };
@@ -77,57 +91,93 @@ function Login() {
 
       mostrarToast("Inicio con Google correcto", "success");
     } catch (error) {
-      mostrarToast("No se pudo iniciar con Google", "error");
+      console.error("Error Google:", error);
+      mostrarToast(error.message || "No se pudo iniciar con Google", "error");
     }
   };
 
   const entrarInvitado = () => {
     localStorage.setItem("guest", "true");
+    localStorage.removeItem("usuarioCliente");
+    localStorage.removeItem("usuarioTemporal");
+    sessionStorage.removeItem("flujo2FA");
+
     mostrarToast("Entrando como invitado", "success");
 
     setTimeout(() => {
-      navigate("/catalogo");
+      navigate("/inicio");
     }, 1000);
   };
 
   const entrarSistema = async () => {
-  if (!usuario) return;
+    if (!usuario) return;
 
-  try {
-    mostrarToast("Enviando código al correo...", "success");
+    if (usuario.tipo === "google") {
+      try {
+        await crearClienteSiNoExiste({
+          nombre: usuario.nombre,
+          correo: usuario.correo,
+          foto: usuario.foto,
+        });
 
-    const respuesta = await fetch(
-  "http://localhost:8080/insignis-store/backend/api/enviarCodigo2FA.php",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: usuario.correo,
-      nombre: usuario.nombre,
-    }),
-  }
-);
+        localStorage.removeItem("guest");
+        localStorage.removeItem("usuarioTemporal");
+        sessionStorage.removeItem("flujo2FA");
 
-    const data = await respuesta.json();
+        localStorage.setItem("usuarioCliente", JSON.stringify(usuario));
 
-    if (!data.ok) {
-      mostrarToast(data.mensaje || "No se pudo enviar el código", "error");
+        mostrarToast("Bienvenido a Insignis", "success");
+
+        setTimeout(() => {
+          navigate("/inicio");
+        }, 1000);
+      } catch (error) {
+        console.error("Error al crear cliente:", error);
+        mostrarToast("No se pudo registrar el cliente", "error");
+      }
+
       return;
     }
 
-    localStorage.setItem("usuarioTemporal", JSON.stringify(usuario));
+    try {
+      mostrarToast("Enviando código al correo...", "success");
 
-    mostrarToast("Código enviado al correo", "success");
+      const respuesta = await fetch(
+  `${API_URL}/enviarCodigo2FA.php`,
+  {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: usuario.correo,
+            nombre: usuario.nombre,
+          }),
+        }
+      );
 
-    setTimeout(() => {
-      navigate("/verificacion-2fa");
-    }, 1000);
-  } catch (error) {
-    mostrarToast("Error al conectar con PHP", "error");
-  }
-};
+      const data = await respuesta.json();
+
+      if (!data.ok) {
+        mostrarToast(data.mensaje || "No se pudo enviar el código", "error");
+        return;
+      }
+
+      localStorage.setItem("usuarioTemporal", JSON.stringify(usuario));
+      localStorage.removeItem("guest");
+
+      sessionStorage.setItem("flujo2FA", "login");
+
+      mostrarToast("Código enviado al correo", "success");
+
+      setTimeout(() => {
+        navigate("/verificacion-2fa");
+      }, 1000);
+    } catch (error) {
+      console.error("Error 2FA:", error);
+      mostrarToast("Error al conectar con PHP", "error");
+    }
+  };
 
   const cerrarUsuario = () => {
     setUsuario(null);
@@ -158,16 +208,16 @@ function Login() {
         {usuario ? (
           <div className="usuario-box">
             <img
-  src={usuario.foto || logo}
-  className={`usuario-foto ${
-    usuario.foto === logo || !usuario.foto ? "foto-logo" : ""
-  }`}
-  alt=""
-  onError={(e) => {
-    e.currentTarget.src = logo;
-    e.currentTarget.classList.add("foto-logo");
-  }}
-/>
+              src={usuario.foto || logo}
+              className={`usuario-foto ${
+                usuario.foto === logo || !usuario.foto ? "foto-logo" : ""
+              }`}
+              alt="Usuario"
+              onError={(e) => {
+                e.currentTarget.src = logo;
+                e.currentTarget.classList.add("foto-logo");
+              }}
+            />
 
             <h3>{usuario.nombre}</h3>
             <p>{usuario.correo}</p>
@@ -183,11 +233,17 @@ function Login() {
         ) : (
           <>
             {!mostrarLogin ? (
-              <button className="btn-login fade-in fade-delay" onClick={abrirLogin}>
+              <button
+                className="btn-login fade-in fade-delay"
+                onClick={abrirLogin}
+              >
                 INICIAR SESIÓN
               </button>
             ) : (
-              <button className="btn-login fade-in fade-delay" onClick={entrarInvitado}>
+              <button
+                className="btn-login fade-in fade-delay"
+                onClick={entrarInvitado}
+              >
                 ENTRAR COMO INVITADO
               </button>
             )}
@@ -208,7 +264,10 @@ function Login() {
                   onChange={(e) => setPass(e.target.value)}
                 />
 
-                <button type="button" onClick={() => setMostrarPass(!mostrarPass)}>
+                <button
+                  type="button"
+                  onClick={() => setMostrarPass(!mostrarPass)}
+                >
                   👁
                 </button>
               </div>
@@ -223,17 +282,29 @@ function Login() {
                   </div>
 
                   <div className="pass-rules visible">
-                    <div className={`pass-rule ${pass.length >= 6 ? "ok" : "fail"}`}>
+                    <div
+                      className={`pass-rule ${
+                        pass.length >= 6 ? "ok" : "fail"
+                      }`}
+                    >
                       <span className="dot"></span>
                       Mínimo 6 caracteres
                     </div>
 
-                    <div className={`pass-rule ${/[A-Z]/.test(pass) ? "ok" : "fail"}`}>
+                    <div
+                      className={`pass-rule ${
+                        /[A-Z]/.test(pass) ? "ok" : "fail"
+                      }`}
+                    >
                       <span className="dot"></span>
                       Una letra mayúscula
                     </div>
 
-                    <div className={`pass-rule ${/[0-9]/.test(pass) ? "ok" : "fail"}`}>
+                    <div
+                      className={`pass-rule ${
+                        /[0-9]/.test(pass) ? "ok" : "fail"
+                      }`}
+                    >
                       <span className="dot"></span>
                       Un número
                     </div>
@@ -265,7 +336,11 @@ function Login() {
           <img src={whatsapp} alt="WhatsApp" />
         </a>
 
-        <a href="https://www.tiktok.com/@insignis.bo" target="_blank" rel="noreferrer">
+        <a
+          href="https://www.tiktok.com/@insignis.bo"
+          target="_blank"
+          rel="noreferrer"
+        >
           <img src={tiktok} alt="TikTok" />
         </a>
 
