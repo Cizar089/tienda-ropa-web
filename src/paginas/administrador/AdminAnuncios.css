@@ -1,0 +1,214 @@
+.admin-anuncios {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(0, 120, 255, 0.22), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(255, 80, 0, 0.12), transparent 35%),
+    #02040a;
+  color: white;
+  padding: 35px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.anuncios-header {
+  background: rgba(5, 12, 25, 0.9);
+  border: 1px solid rgba(100, 180, 255, 0.22);
+  border-radius: 18px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.anuncios-header p {
+  margin: 0;
+  color: #6db7ff;
+  letter-spacing: 4px;
+  font-size: 12px;
+}
+
+.anuncios-header h1 {
+  margin: 8px 0 0;
+  letter-spacing: 4px;
+}
+
+.anuncios-layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 25px;
+}
+
+.anuncios-form,
+.anuncios-lista {
+  background: rgba(5, 12, 25, 0.9);
+  border: 1px solid rgba(100, 180, 255, 0.22);
+  border-radius: 18px;
+  padding: 25px;
+}
+
+.anuncios-form h2,
+.anuncios-lista h2 {
+  margin-top: 0;
+  color: #8dbdf5;
+}
+
+.anuncios-form label {
+  display: block;
+  color: #9ca3af;
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin: 14px 0 7px;
+  font-weight: bold;
+}
+
+.anuncios-form input,
+.anuncios-form textarea,
+.anuncios-form select {
+  width: 100%;
+  background: #07111f;
+  border: 1px solid rgba(100, 180, 255, 0.25);
+  color: white;
+  padding: 13px;
+  border-radius: 9px;
+  outline: none;
+}
+
+.anuncios-form textarea {
+  height: 110px;
+  resize: none;
+}
+
+.preview-anuncio {
+  height: 150px;
+  margin-top: 15px;
+  background: #07111f;
+  border: 1px solid rgba(100, 180, 255, 0.25);
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  color: #777;
+}
+
+.preview-anuncio img {
+  max-width: 100%;
+  max-height: 135px;
+  object-fit: contain;
+}
+
+.anuncios-form button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  border: none;
+  border-radius: 9px;
+  background: #4da3ff;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.anuncios-form .cancelar {
+  background: #444;
+  color: white;
+}
+
+.anuncios-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.anuncio-card {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  background: rgba(10, 20, 40, 0.82);
+  border: 1px solid rgba(100, 180, 255, 0.22);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.anuncio-card img,
+.sin-imagen {
+  width: 170px;
+  height: 100%;
+  min-height: 220px;
+}
+
+.anuncio-card img {
+  object-fit: cover;
+}
+
+.sin-imagen {
+  display: grid;
+  place-items: center;
+  background: #111827;
+  color: #777;
+}
+
+.anuncio-info {
+  padding: 18px;
+}
+
+.anuncio-info h3 {
+  margin: 10px 0;
+}
+
+.anuncio-info p {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.anuncio-info small {
+  color: #8dbdf5;
+  display: block;
+  margin-top: 10px;
+}
+
+.estado {
+  padding: 6px 9px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.estado.activo {
+  background: rgba(0, 255, 157, 0.15);
+  color: #00ff9d;
+}
+
+.estado.inactivo {
+  background: rgba(255, 77, 77, 0.15);
+  color: #ff4d4d;
+}
+
+.acciones-anuncio {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.acciones-anuncio button {
+  border: none;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: #1f2937;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.acciones-anuncio .eliminar {
+  background: #3b0a0a;
+  color: #ef4444;
+}
+
+.vacio {
+  color: #aaa;
+}
+
+@media (max-width: 1000px) {
+  .anuncios-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .anuncios-grid {
+    grid-template-columns: 1fr;
+  }
+}

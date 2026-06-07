@@ -1,0 +1,53 @@
+.acceso-admin {
+  min-height: 100vh;
+  background: #050505;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.acceso-card {
+  width: 360px;
+  background: #111;
+  border: 1px solid #222;
+  padding: 35px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.acceso-card h1 {
+  letter-spacing: 6px;
+}
+
+.acceso-card p {
+  color: #aaa;
+}
+
+.acceso-card input {
+  width: 100%;
+  padding: 15px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: white;
+  text-align: center;
+  font-size: 22px;
+  letter-spacing: 8px;
+  border-radius: 6px;
+}
+
+.acceso-card span {
+  display: block;
+  color: #ef4444;
+  margin-top: 12px;
+}
+
+.acceso-card button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  background: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
